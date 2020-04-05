@@ -1,4 +1,4 @@
-灯塔客户端2.0
+灯塔客户端4.1
 
 Youtube：米月
 
@@ -17,7 +17,7 @@ apt install wget -y
 </code>
 </p>
 <code>
-bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/pzwsquare/dt_client/master/dt_cli)
+bash <(wget --no-check-certificate -qO- https://raw.githubusercontent.com/poplovetorock/dt_client/master/dt_cli)
 </code>
 </p>
 <img src="https://git.io/Jvis1">
