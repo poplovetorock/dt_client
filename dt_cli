@@ -115,11 +115,11 @@ dpkg -i smartdns.deb
 cat << EOF > /etc/smartdns/smartdns.conf
 bind :55 -force-aaaa-soa -no-dualstack-selection
 bind :56 -no-speed-check -group GFW -no-rule-addr -force-aaaa-soa -no-dualstack-selection
-speed-check-mode ping,tcp:443,tcp:80
-cache-size 60000
+speed-check-mode tcp:443,tcp:80,ping
+cache-size 20480
 rr-ttl 600
 rr-ttl-min 60
-rr-ttl-max 1000
+rr-ttl-max 600
 prefetch-domain yes
 serve-expired yes
 serve-expired-ttl 0
@@ -133,12 +133,15 @@ conf-file /etc/smartdns/gfw_domain.conf
 server 218.4.4.4
 server 61.147.37.1
 server 114.114.114.114
+server-tls dns.rubyfish.cn:853
 server-tls 8.8.8.8 -group GFW -exclude-default-group
 server-tls 8.8.4.4 -group GFW -exclude-default-group
 server-tls 1.1.1.1 -group GFW -exclude-default-group
 server-tls 1.0.0.1 -group GFW -exclude-default-group
+server-tls dns.rubyfish.cn:853 -group GFW -exclude-default-group
+server-https https://dns.233py.com/dns-query -group GFW -exclude-default-group
 server-https https://cloudflare-dns.com/dns-query -group GFW -exclude-default-group
-server-https https://dns.google/dns-query -group GFW -exclude-default-group 
+server-https https://dns.google/dns-query -group GFW -exclude-default-group
 EOF
 
 rm -rf /opt/smartdns.deb
@@ -3095,16 +3098,15 @@ chown -R clash /home/clash/.config/
 
 chmod +x /home/clash/.config/clash/Country.mmdb
 
-cat << EOF > /lib/systemd/system/clash@.service
+cat << EOF > /etc/systemd/system/clash.service
 [Unit]
-Description=A rule based proxy in Go for %i.
-After=network.target
+Description=clash daemon
 
 [Service]
 Type=simple
-User=%i
-Restart=on-abort
-ExecStart=/usr/local/bin/clash
+User=clash
+ExecStart=/usr/local/bin/clash -d /home/clash/.config/clash/
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
@@ -3113,9 +3115,9 @@ EOF
 
 systemctl daemon-reload
 
-systemctl enable clash@clash
+systemctl enable clash.service
 
-systemctl start clash@clash > /dev/null 2>&1
+systemctl start clash.service > /dev/null 2>&1
 
 sleep 5
 }
