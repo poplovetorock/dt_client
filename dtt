@@ -1,0 +1,133 @@
+#!/bin/bash
+
+if [[ $(id -u) != 0 ]]; then
+	clear
+    whiptail --title "错误信息" --msgbox "请在root用户下执行" 8 78 
+	exit 1
+fi
+
+if [[ $(uname -m 2> /dev/null) != x86_64 ]]; then
+	clear
+    whiptail --title "错误信息" --msgbox "请在64位系统下运行此脚本" 8 78 
+	exit 1
+fi
+
+#操作系统判断
+osdist(){
+
+    set -e
+    if cat /etc/*release | grep ^NAME | grep -q Debian; then
+
+        dist=debian
+        apt-get update -q
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get install whiptail curl locales lsb-release jq dnsutils lsof -y -qq
+
+    else
+        clear
+        whiptail --title "错误信息" --msgbox "本脚本只能在debian10下运行" 8 78     
+        exit 1; 
+    fi
+}
+
+dt_sub() {
+
+cd /home/clash/.config/clash
+
+wget --no-check-certificate -O dtsub $SUB
+
+chown -R clash /home/clash/.config/
+
+chmod +x /home/clash/.config/clash/dtsub
+
+cat << EOF > /lib/systemd/system/dtsub@.service
+[Unit]
+Description=A rule based proxy in Go for %i.
+After=network.target
+[Service]
+Type=simple
+User=%i
+Restart=on-abort
+ExecStart=/home/clash/.config/clash/dtsub
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+
+systemctl enable dtsub@root
+
+systemctl start dtsub@root > /dev/null 2>&1
+
+}
+
+dt_update_sub(){
+
+    systemctl stop dtsub@root
+
+    cd /home/clash/.config/clash
+
+    rm -rf /home/clash/.config/clash/dtsub
+
+    wget --no-check-certificate -O dtsub $SUB
+
+    chown -R clash /home/clash/.config/
+
+    chmod +x /home/clash/.config/clash/dtsub
+
+    systemctl start dtsub@root > /dev/null 2>&1
+
+}
+
+dt_menu() {
+ Mainmenu=$(whiptail --clear --ok-button "确定" --backtitle "version:20200401v1" --title "灯塔管理端v3.0" --menu --nocancel "
+**********************************************************************************
+简介：灯塔管理端v3.0
+系统：Debian10
+Youtube：米月、Unicom
+电报群：https://t.me/mi_yue
+Youtube频道地址：https://t.im/n21o
+**********************************************************************************
+请选择需要安装的内容：
+    " 22 86 5\
+        "1" " 安装灯塔管理端"\
+        "2" " 更新灯塔管理端"\
+        "3" " 退出" 3>&1 1>&2 2>&3)
+    case $Mainmenu in
+        1)
+        dt_sub
+        whiptail --title "灯塔管理端安装成功" --msgbox "
+*************************************************************************
+Youtube：米月、Unicom
+电报群：https://t.me/mi_yue
+Youtube频道地址：https://t.im/n21o
+灯塔web页面:http://$loc_ip:8000/
+*************************************************************************" 18 78
+        clear
+        ;;
+        2)
+        dt_update_sub
+        whiptail --title "灯塔管理端更新成功" --msgbox "
+*************************************************************************
+Youtube：米月、Unicom
+电报群：https://t.me/mi_yue
+Youtube频道地址：https://t.im/n21o
+灯塔web页面:http://$loc_ip:8000/
+*************************************************************************" 18 78
+        # clear
+        ;;
+        3)
+        #exit
+        clear
+        whiptail --title "脚本已退出" --msgbox "真希望把你留住" 8 78
+        ;;
+        esac
+}
+
+eth_n=$(ip --oneline link show up | grep -v "lo" | awk '{print$2;exit}' | cut -d':' -f1 | cut -d'@' -f1)
+
+loc_ip=$(ip a | grep "$eth_n" | awk '{print $2}' | awk 'END {print}' | cut -d'/' -f1)
+
+SUB="https://storage.rinvay.co/Dt/dtsub_1.0.2"
+
+dt_menu
