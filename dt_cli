@@ -100,17 +100,14 @@ done
 
 gate_ip=$(route -n | grep $ETH_N | grep UG | awk '{print $2}')
 
-# while [[ -z ${svr_domain} ]]; do
-#     svr_domain=$(whiptail --inputbox --nocancel "灯塔VPS域名" 8 78 --title "输入域名：（可以用公益节点来安装:bwg.ps9.win）" 3>&1 1>&2 2>&3)
-# done
+while [[ -z ${svr_domain} ]]; do
+   svr_domain=$(whiptail --inputbox --nocancel "灯塔VPS域名" 8 78 --title "输入域名：（可以用公益节点来安装:bwg.ps9.win）" 3>&1 1>&2 2>&3)
+done
 
-svr_domain="poplovetodance.xyz"
+while [[ -z ${svr_pwd} ]]; do
+  svr_pwd=$(whiptail --inputbox --nocancel "灯塔VPS密码" 8 78 --title "输入密码：（可以用公益节点密码：qwer4321）" 3>&1 1>&2 2>&3)
+done
 
-# while [[ -z ${svr_pwd} ]]; do
-#     svr_pwd=$(whiptail --inputbox --nocancel "灯塔VPS密码" 8 78 --title "输入密码：（可以用公益节点密码：qwer4321）" 3>&1 1>&2 2>&3)
-# done
-
-svr_pwd="224266b3"
 }
 
 
