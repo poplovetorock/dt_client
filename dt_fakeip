@@ -1779,11 +1779,10 @@ external-controller: 0.0.0.0:9090
 dns:
   enable: true
   listen: 0.0.0.0:53
-  enhanced-mode: redir-host
+  enhanced-mode: fake-ip  #DNS模式，这里推荐使用fake-ip，因为后续的iptables规则是根据fake-ip做的
+  fake-ip-range: 198.18.0.1/16 # if you don't know what it is, don't change it
   nameserver:
-    - 127.0.0.1:55
-  fallback:
-    - 127.0.0.1:56
+    - 127.0.0.1:5301
 secret: miyue
 external-ui: dashboard
 Proxy:
