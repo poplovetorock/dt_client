@@ -130,8 +130,8 @@ server 114.114.114.114
 server-tls dns.rubyfish.cn:853
 server-tls 8.8.4.4
 server-tls 1.1.1.1
-server-tls dns.rubyfish.cn:853
 server-https https://dns.233py.com/dns-query
+server-https https://ea-dns.rubyfish.cn/dns-query
 server-https https://cloudflare-dns.com/dns-query
 server-https https://dns.google/dns-query
 EOF
