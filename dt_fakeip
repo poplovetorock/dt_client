@@ -16,7 +16,7 @@ echo clash | sudo passwd clash --stdin  &>/dev/null
 
 apt update
 
-yes|apt -y install sudo supervisor iptables-persistent net-tools curl gzip unzip
+yes|apt -y install sudo supervisor iptables-persistent net-tools curl gzip unzip git make htop
 
 source /etc/profile
 
@@ -111,10 +111,9 @@ cat << EOF > /etc/smartdns/smartdns.conf
 bind :5301 -force-aaaa-soa -no-dualstack-selection
 
 speed-check-mode tcp:443,tcp:80,ping
-cache-size 20480
-rr-ttl 600
+cache-size 0
 rr-ttl-min 60
-rr-ttl-max 600
+rr-ttl-max 3600
 prefetch-domain yes
 serve-expired yes
 serve-expired-ttl 0
@@ -147,6 +146,33 @@ cd
 systemctl enable smartdns
 systemctl start smartdns > /dev/null 2>&1
 
+}
+
+unbound(){
+
+apt install unbound -y
+
+cat > /etc/default/unbound << EOF
+RESOLVCONF="false"
+ROOT_TRUST_ANCHOR_UPDATE="false"
+EOF
+
+cd /etc/unbound/
+
+wget https://raw.githubusercontent.com/poplovetorock/clash1step/master/unbound.conf -O unbound.conf
+
+# 下载证书
+wget https://raw.githubusercontent.com/poplovetorock/clash1step/master/named.cache -O/etc/unbound/root.hints
+# 生成unbound-control证书文件
+unbound-control-setup
+
+git clone https://github.com/felixonmars/dnsmasq-china-list.git --depth 1
+
+cd dnsmasq-china-list
+
+make SERVER=127.0.0.1@5301 unbound
+
+cp *unbound.conf /etc/unbound/unbound.conf.d/
 }
 
 #trojan
