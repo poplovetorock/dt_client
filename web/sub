@@ -128,6 +128,6 @@ eth_n=$(ip --oneline link show up | grep -v "lo" | awk '{print$2;exit}' | cut -d
 
 loc_ip=$(ip a | grep "$eth_n" | awk '{print $2}' | awk 'END {print}' | cut -d'/' -f1)
 
-SUB="https://i.lioil.cc/live/dtsub"
+SUB="https://i.lioil.cc/live/dtsub-1.2.19"
 
 dt_menu
